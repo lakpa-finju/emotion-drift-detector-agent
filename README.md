@@ -171,6 +171,62 @@ DRIFT_THRESHOLD = 0.3          # Sensitivity threshold
 Text Input → LLM Analysis → Wave Features → Drift Detection → Response Generation
 ```
 
+## ⚖️ Key Design Tradeoffs
+
+### 1. Mathematical Complexity vs. Implementation Simplicity
+
+**The Tradeoff:** 
+Choosing between implementing a sophisticated wave-based mathematical model (involving FFT analysis, Hilbert transforms, and signal processing) versus a simpler approach like basic sentiment scoring or rule-based emotional transitions.
+
+**Decision Made:** 
+Chose the mathematically sophisticated wave analysis approach despite the implementation complexity.
+
+**Reasoning:**
+The wave-based approach provides significantly more nuanced emotional understanding. Simple sentiment analysis would miss critical patterns like "I'm anxious but excited" (high arousal with mixed valence) or wouldn't detect gradual emotional drift over time. The mathematical complexity enables the system to:
+- Detect subtle emotional changes that simpler systems miss
+- Predict emotional trajectories rather than just react to current state
+- Provide quantifiable drift scores that can trigger appropriate interventions
+- Scale to incorporate future biometric data streams
+
+**What Was Given Up:** 
+Faster development time, easier debugging, and simpler maintenance in exchange for superior emotional accuracy and future extensibility.
+
+### 2. Real-time Response vs. Comprehensive Analysis
+
+**The Tradeoff:** 
+Users expect immediate responses to their emotional inputs, but comprehensive wave analysis requires processing historical data and performing complex mathematical operations that take time.
+
+**Decision Made:** 
+Implemented a hybrid approach where the system provides immediate basic emotional acknowledgment while performing deeper wave analysis in the background.
+
+**Reasoning:**
+User experience research shows that emotional support systems need to feel responsive and empathetic. A 10-second delay while computing FFT analysis would break the conversational flow and reduce user trust. However, the deep analysis is crucial for accurate drift detection. The hybrid approach allows the system to:
+- Maintain conversational flow with immediate responses
+- Provide increasingly sophisticated analysis as more data becomes available
+- Update drift scores and trajectories without blocking user interaction
+- Cache analysis results to improve future response times
+
+**What Was Given Up:** 
+Perfect accuracy in first responses and some computational efficiency (running dual processing paths) in exchange for better user experience and practical usability.
+
+### 3. Future Extensibility vs. Current Simplicity
+
+**The Tradeoff:** 
+Building a minimal system focused only on the current requirements (3-day text-based emotional tracking) or designing a more complex architecture that could easily accommodate future features like biometric integration, multi-user support, and organizational analytics.
+
+**Decision Made:** 
+Chose a modular architecture with clear extension points and standardized interfaces, even though it required more upfront design work.
+
+**Reasoning:**
+The modular design prevents costly rewrites later and enables:
+- Easy integration of new data sources (HRV, voice, breathing patterns)
+- Scaling from individual to team/organizational analysis
+- Adding new emotional analysis algorithms without changing core architecture
+- Supporting different LLM providers and analysis methods
+
+**What Was Given Up:** 
+Faster initial development and simpler codebase structure in exchange for long-term maintainability and growth potential. The system is more complex than needed for just the 3-day demo, but this investment pays off when expanding functionality.
+
 ## 🔬 Research Foundations
 
 The wave-based approach is grounded in research showing emotions exhibit oscillatory patterns:

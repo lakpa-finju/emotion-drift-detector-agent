@@ -58,7 +58,7 @@ emotion-drift-detector-agent/
 
 1. **Clone and Install**
 ```bash
-git clone <repository-url>
+git clone https://github.com/lakpa-finju/emotion-drift-detector-agent.git
 cd emotion-drift-detector-agent
 pip install -r requirements.txt
 ```

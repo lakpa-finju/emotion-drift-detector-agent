@@ -146,10 +146,10 @@ Generate a response that feels like it's from someone who genuinely cares and ge
                     SystemMessage(content="You are an emotionally intelligent AI companion. Be warm, empathetic, and naturally conversational."),
                     HumanMessage(content=prompt)
                 ]
-                response = self.llm(messages)
+                response = self.llm.invoke(messages)
                 response_text = response.content
             else:
-                response_text = self.llm(prompt)
+                response_text = self.llm.invoke(prompt)
             
             # Add to conversation memory
             self.memory.chat_memory.add_user_message(user_input)

@@ -116,10 +116,10 @@ Respond ONLY with a valid JSON object in this exact format:
                     SystemMessage(content="You are an expert emotional analyst. Respond only with valid JSON."),
                     HumanMessage(content=prompt)
                 ]
-                response = self.llm(messages)
+                response = self.llm.invoke(messages)
                 response_text = response.content
             else:
-                response_text = self.llm(prompt)
+                response_text = self.llm.invoke(prompt)
             
             # Parse the JSON response
             emotion_data = self._parse_emotion_response(response_text)

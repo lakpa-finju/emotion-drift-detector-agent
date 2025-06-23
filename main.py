@@ -345,8 +345,11 @@ class EmotionalDriftTracker:
             
             plt.tight_layout()
             
-            # Save the plot
-            plot_filename = f"emotional_waves_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            # Ensure assets directory exists
+            os.makedirs("assets", exist_ok=True)
+            
+            # Save the plot to assets directory
+            plot_filename = f"assets/emotional_waves_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
             plt.savefig(plot_filename, dpi=300, bbox_inches='tight')
             
             self.console.print(f"\n[green]Visualization saved as: {plot_filename}[/green]")

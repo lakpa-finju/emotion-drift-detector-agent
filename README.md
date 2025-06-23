@@ -31,9 +31,12 @@ emotion-drift-detector-agent/
 │   │   └── emotion_processor.py        # LLM-powered emotion extraction
 │   ├── generators/
 │   │   └── response_generator.py       # Context-aware response generation
-│   └── config/
-│       └── config.py                   # Centralized configuration
+│   ├── config/
+│   │   └── config.py                   # Centralized configuration
+│   └── utils/
+│       └── emotional_memory.json       # Persistent emotional history storage
 │
+├── assets/                             # Generated visualizations and plots
 └── examples/
     ├── test_3_day_simulation.py        # 3-day emotional journey demo
     └── test_example.py                 # Basic functionality demo
@@ -135,9 +138,177 @@ It's natural to feel anxious before something important. What specific aspects a
 weighing on your mind the most?
 ```
 
+### Pre-Built Test Scenarios
+
+For testing and demonstration, run the 3-day simulation with predefined emotional journeys:
+
+```bash
+python examples/test_3_day_simulation.py
+```
+
+The system provides three carefully designed scenarios that demonstrate different emotional patterns. Below are the **actual results** from running each scenario:
+
+#### Scenario 1: Workplace Burnout Journey
+*Shows gradual progression from excitement to overwhelm*
+
+```
+Running Scenario: Workplace Burnout Journey
+
+Day 1 - Input: "New project kickoff! Feeling energized."
+┏━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Dimension ┃ Value ┃ Interpretation ┃
+┡━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ Valence   │ +0.80 │ Positive 😊    │
+│ Arousal   │ 0.70  │ High energy ⚡ │
+│ Dominance │ +0.60 │ In control 💪  │
+│ Intensity │ 0.70  │ Strong 🔥      │
+└───────────┴───────┴────────────────┘
+
+Day 2 - Input: "Lots of meetings but making progress."
+┏━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Dimension ┃ Value ┃ Interpretation ┃
+┡━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ Valence   │ +0.30 │ Neutral 😐     │
+│ Arousal   │ 0.60  │ Moderate 🔋    │
+│ Dominance │ +0.20 │ Balanced ⚖️    │
+│ Intensity │ 0.40  │ Moderate 📊    │
+└───────────┴───────┴────────────────┘
+
+Day 3 - Input: "Drowning in tasks. Everything urgent."
+┏━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Dimension ┃ Value ┃ Interpretation  ┃
+┡━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━┩
+│ Valence   │ -0.60 │ Negative 😔     │
+│ Arousal   │ 0.80  │ High energy ⚡  │
+│ Dominance │ -0.70 │ Less control 🤝 │
+│ Intensity │ 0.85  │ Strong 🔥       │
+└───────────┴───────┴─────────────────┘
+
+Wave-Based Analysis Results:
+┏━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┓
+┃ Metric          ┃ Value     ┃ Interpretation    ┃
+┡━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━┩
+│ Drift Score     │ 0.378     │ Moderate drift 〰️ │
+│ Trend Direction │ declining │ 📉 Declining      │
+│ Stability Index │ 0.169     │ Unstable 🌪️       │
+│ Volatility      │ 0.187     │ Low volatility 😌 │
+└─────────────────┴───────────┴───────────────────┘
+
+AI Response: "I hear you - it's like everything's coming at you all at once. 
+I've noticed you've been carrying more and more lately, and it sounds completely 
+overwhelming right now. Want to just take a breath together?"
+```
+
+#### Scenario 2: Recovery Trajectory  
+*Demonstrates emotional recovery and healing patterns*
+
+```
+Running Scenario: Recovery Trajectory
+
+Day 1 - Input: "Rough week. Everything feels heavy."
+┏━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Dimension ┃ Value ┃ Interpretation  ┃
+┡━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━┩
+│ Valence   │ -0.60 │ Negative 😔     │
+│ Arousal   │ 0.20  │ Low energy 😴   │
+│ Dominance │ -0.70 │ Less control 🤝 │
+│ Intensity │ 0.65  │ Strong 🔥       │
+└───────────┴───────┴─────────────────┘
+
+Day 2 - Input: "Taking some time to reset."
+┏━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Dimension ┃ Value ┃ Interpretation ┃
+┡━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ Valence   │ +0.20 │ Neutral 😐     │
+│ Arousal   │ 0.20  │ Low energy 😴  │
+│ Dominance │ +0.30 │ In control 💪  │
+│ Intensity │ 0.40  │ Moderate 📊    │
+└───────────┴───────┴────────────────┘
+
+Day 3 - Input: "Feeling more like myself again."
+┏━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Dimension ┃ Value ┃ Interpretation ┃
+┡━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ Valence   │ +0.45 │ Positive 😊    │
+│ Arousal   │ 0.35  │ Moderate 🔋    │
+│ Dominance │ +0.40 │ In control 💪  │
+│ Intensity │ 0.45  │ Moderate 📊    │
+└───────────┴───────┴────────────────┘
+
+Wave-Based Analysis Results:
+┏━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┓
+┃ Metric          ┃ Value     ┃ Interpretation    ┃
+┡━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━┩
+│ Drift Score     │ 0.325     │ Moderate drift 〰️ │
+│ Trend Direction │ improving │ 📈 Improving      │
+│ Stability Index │ 0.008     │ Unstable 🌪️       │
+│ Volatility      │ 0.108     │ Low volatility 😌 │
+└─────────────────┴───────────┴───────────────────┘
+
+AI Response: "That's really good to hear! I know it hasn't been the easiest road, 
+but there's something so comforting about feeling like yourself again, isn't there?"
+```
+
+#### Scenario 3: Emotional Volatility
+*Shows high emotional swings and system adaptation*
+
+```
+Running Scenario: Emotional Volatility
+
+Day 1 - Input: "Amazing presentation today!"
+┏━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Dimension ┃ Value ┃ Interpretation ┃
+┡━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ Valence   │ +0.80 │ Positive 😊    │
+│ Arousal   │ 0.70  │ High energy ⚡ │
+│ Dominance │ +0.40 │ In control 💪  │
+│ Intensity │ 0.70  │ Strong 🔥      │
+└───────────┴───────┴────────────────┘
+
+Day 2 - Input: "Client meeting went terribly."
+┏━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Dimension ┃ Value ┃ Interpretation  ┃
+┡━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━┩
+│ Valence   │ -0.60 │ Negative 😔     │
+│ Arousal   │ 0.65  │ High energy ⚡  │
+│ Dominance │ -0.40 │ Less control 🤝 │
+│ Intensity │ 0.75  │ Strong 🔥       │
+└───────────┴───────┴─────────────────┘
+
+Day 3 - Input: "Found a way to fix everything."
+┏━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Dimension ┃ Value ┃ Interpretation ┃
+┡━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ Valence   │ +0.85 │ Positive 😊    │
+│ Arousal   │ 0.65  │ High energy ⚡ │
+│ Dominance │ +0.80 │ In control 💪  │
+│ Intensity │ 0.75  │ Strong 🔥      │
+└───────────┴───────┴────────────────┘
+
+Wave-Based Analysis Results:
+┏━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┓
+┃ Metric          ┃ Value  ┃ Interpretation      ┃
+┡━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━┩
+│ Drift Score     │ 0.327  │ Moderate drift 〰️   │
+│ Trend Direction │ stable │ ➡️ Stable            │
+│ Stability Index │ 0.510  │ Moderately stable ⛰️ │
+│ Volatility      │ 0.024  │ Low volatility 😌   │
+└─────────────────┴────────┴─────────────────────┘
+
+AI Response: "That's fantastic! I can feel your confidence coming through. 
+What's got you feeling so on top of things? 😊"
+```
+
+**Key Observations from Real Results:**
+
+1. **Burnout Detection**: Clear degradation from positive (+0.80 valence) to negative (-0.60 valence) with declining trend
+2. **Recovery Tracking**: Successful progression from negative (-0.60) to positive (+0.45) with improving trend  
+3. **Volatility Management**: High emotional swings but stable overall trend with moderate stability index
+4. **Contextual AI Responses**: Each response demonstrates awareness of the emotional journey and provides appropriate support
+
 ### Available Commands
 - `analyze` - Full emotional dashboard
-- `visualize` - Generate wave plots
+- `visualize` - Generate wave plots (saved to assets/ directory)
 - `clear` - Reset history
 - `help` - Show commands
 

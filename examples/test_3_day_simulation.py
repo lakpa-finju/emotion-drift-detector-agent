@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 3-Day Emotional Check-in Simulation
-Demonstrates the exact requirements from the specification
+Demonstrates emotional drift detection with multiple test scenarios
 """
 
 import os
@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+from rich.prompt import IntPrompt
 
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,44 +20,126 @@ from core.wave_emotion_analyzer import WaveBasedEmotionAnalyzer, EmotionalWavePo
 from processors.emotion_processor import EmotionProcessor
 from generators.response_generator import EmotionalResponseGenerator
 
-def simulate_3_day_checkins():
-    """
-    Simulate the exact 3-day emotional check-in scenario from requirements:
-    Day 1: "I'm excited but a bit tired."
-    Day 2: "Meh. I don't feel much today."
-    Day 3: "Back-to-back meetings again. I'm done."
-    """
-    
+def show_scenario_options():
+    """Display available test scenarios"""
     console = Console()
+    
+    console.print(Panel.fit(
+        "[bold blue]🌊 Wave-Based Emotional Drift Tracker - Test Scenarios[/bold blue]",
+        border_style="blue"
+    ))
+    
+    options_table = Table(title="Available Test Scenarios", show_header=True, header_style="bold cyan")
+    options_table.add_column("Option", style="bold white", width=8)
+    options_table.add_column("Scenario", style="yellow", width=25)
+    options_table.add_column("Description", style="dim", width=50)
+    
+    options_table.add_row(
+        "1", 
+        "Workplace Burnout Journey", 
+        "Day 1: 'New project kickoff! Feeling energized.'\nDay 2: 'Lots of meetings but making progress.'\nDay 3: 'Drowning in tasks. Everything urgent.'"
+    )
+    
+    options_table.add_row(
+        "2", 
+        "Recovery Trajectory", 
+        "Day 1: 'Rough week. Everything feels heavy.'\nDay 2: 'Taking some time to reset.'\nDay 3: 'Feeling more like myself again.'"
+    )
+    
+    options_table.add_row(
+        "3", 
+        "Emotional Volatility", 
+        "Day 1: 'Amazing presentation today!'\nDay 2: 'Client meeting went terribly.'\nDay 3: 'Found a way to fix everything.'"
+    )
+    
+    console.print(options_table)
+    console.print("\n[dim]Each scenario demonstrates different emotional drift patterns and system responses.[/dim]")
+
+def get_scenario_data(scenario_choice: int) -> list:
+    """Get the emotional journey data for the selected scenario"""
+    
+    scenarios = {
+        1: {
+            "name": "Workplace Burnout Journey",
+            "description": "Shows gradual progression from excitement to overwhelm",
+            "data": [
+                {
+                    "day": 1,
+                    "input": "New project kickoff! Feeling energized.",
+                    "timestamp": datetime.now() - timedelta(days=2)
+                },
+                {
+                    "day": 2, 
+                    "input": "Lots of meetings but making progress.",
+                    "timestamp": datetime.now() - timedelta(days=1)
+                },
+                {
+                    "day": 3,
+                    "input": "Drowning in tasks. Everything urgent.",
+                    "timestamp": datetime.now()
+                }
+            ]
+        },
+        2: {
+            "name": "Recovery Trajectory", 
+            "description": "Demonstrates emotional recovery and healing patterns",
+            "data": [
+                {
+                    "day": 1,
+                    "input": "Rough week. Everything feels heavy.",
+                    "timestamp": datetime.now() - timedelta(days=2)
+                },
+                {
+                    "day": 2, 
+                    "input": "Taking some time to reset.",
+                    "timestamp": datetime.now() - timedelta(days=1)
+                },
+                {
+                    "day": 3,
+                    "input": "Feeling more like myself again.",
+                    "timestamp": datetime.now()
+                }
+            ]
+        },
+        3: {
+            "name": "Emotional Volatility",
+            "description": "Shows high emotional swings and system adaptation",
+            "data": [
+                {
+                    "day": 1,
+                    "input": "Amazing presentation today!",
+                    "timestamp": datetime.now() - timedelta(days=2)
+                },
+                {
+                    "day": 2, 
+                    "input": "Client meeting went terribly.",
+                    "timestamp": datetime.now() - timedelta(days=1)
+                },
+                {
+                    "day": 3,
+                    "input": "Found a way to fix everything.",
+                    "timestamp": datetime.now()
+                }
+            ]
+        }
+    }
+    
+    return scenarios.get(scenario_choice, scenarios[1])
+
+def run_scenario_simulation(scenario_choice: int):
+    """Run the selected emotional journey scenario"""
+    console = Console()
+    
+    scenario = get_scenario_data(scenario_choice)
+    daily_inputs = scenario["data"]
+    
+    console.print(f"\n[bold green]Running Scenario: {scenario['name']}[/bold green]")
+    console.print(f"[dim]{scenario['description']}[/dim]")
     
     # Initialize components
     wave_analyzer = WaveBasedEmotionAnalyzer(window_size=10)
     emotion_processor = EmotionProcessor()
     response_generator = EmotionalResponseGenerator()
-    
-    # Define the 3-day inputs exactly as specified
-    daily_inputs = [
-        {
-            "day": 1,
-            "input": "I'm excited but a bit tired.",
-            "timestamp": datetime.now() - timedelta(days=2)
-        },
-        {
-            "day": 2, 
-            "input": "Meh. I don't feel much today.",
-            "timestamp": datetime.now() - timedelta(days=1)
-        },
-        {
-            "day": 3,
-            "input": "Back-to-back meetings again. I'm done.",
-            "timestamp": datetime.now()
-        }
-    ]
-    
-    console.print(Panel.fit(
-        "[bold blue]3-Day Emotional Check-in Analysis[/bold blue]",
-        border_style="blue"
-    ))
     
     emotional_states = []
     
@@ -82,22 +165,8 @@ def simulate_3_day_checkins():
             console.print(f"[red]LLM Error: {e}[/red]")
             console.print("[yellow]Using basic emotion analysis...[/yellow]")
             
-            # Only use fallback if LLM completely fails
-            if day_data['day'] == 1:
-                current_emotion = EmotionalWavePoint(
-                    timestamp=day_data['timestamp'],
-                    valence=0.6, arousal=0.4, dominance=0.2, intensity=0.5
-                )
-            elif day_data['day'] == 2:
-                current_emotion = EmotionalWavePoint(
-                    timestamp=day_data['timestamp'],
-                    valence=0.0, arousal=0.2, dominance=0.0, intensity=0.3
-                )
-            else:  # Day 3
-                current_emotion = EmotionalWavePoint(
-                    timestamp=day_data['timestamp'],
-                    valence=-0.6, arousal=0.3, dominance=-0.3, intensity=0.7
-                )
+            # Fallback emotional states based on scenario
+            current_emotion = _get_fallback_emotion(scenario_choice, day_data['day'], day_data['timestamp'])
         
         # Add to analyzer
         wave_analyzer.add_emotional_point(current_emotion)
@@ -141,37 +210,72 @@ def simulate_3_day_checkins():
         # Use the actual emotional progression for response generation
         response = response_generator.generate_response(
             daily_inputs[2]['input'],  # Day 3 input
-            emotional_states[-1],      # Day 3 emotion (actual LLM-generated)
+            emotional_states[-1],      # Day 3 emotion
             wave_analysis,             # Overall drift analysis
-            emotional_states           # All 3 days of history (actual LLM-generated)
+            emotional_states           # All 3 days of history
         )
     except Exception as e:
         console.print(f"[red]LLM Error: {e}[/red]")
         console.print("[yellow]Using fallback response...[/yellow]")
-        
-        # Generate fallback based on actual emotional progression
-        if len(emotional_states) >= 3:
-            valence_change = emotional_states[-1].valence - emotional_states[0].valence
-            arousal_change = emotional_states[-1].arousal - emotional_states[0].arousal
-            
-            if valence_change < -0.3 and arousal_change < -0.1:
-                response = "You've been gradually moving from energized to flat. It's okay to name that. Want to pause for a 2-minute breath reset?"
-            elif emotional_states[-1].valence < -0.3:
-                response = "That sounds really draining. I can hear how done you are with all this."
-            else:
-                response = "Thanks for sharing that with me. How are you doing?"
-        else:
-            response = "Thanks for sharing that with me. How are you doing?"
+        response = _get_fallback_response(scenario_choice, emotional_states)
     
     console.print(Panel(
         response,
-        title="[bold green]Response[/bold green]",
+        title="[bold green]AI Response[/bold green]",
         border_style="green",
         padding=(1, 2)
     ))
     
-    # Show the emotional trajectory with all 4 dimensions
-    console.print(f"\n[bold cyan]Emotional Journey[/bold cyan]")
+    # Show the emotional trajectory
+    _display_emotional_trajectory(daily_inputs, emotional_states, scenario['name'])
+
+def _get_fallback_emotion(scenario_choice: int, day: int, timestamp: datetime) -> EmotionalWavePoint:
+    """Get fallback emotional states when LLM fails"""
+    
+    # Scenario 1: Workplace Burnout Journey
+    if scenario_choice == 1:
+        if day == 1:
+            return EmotionalWavePoint(timestamp=timestamp, valence=0.7, arousal=0.8, dominance=0.5, intensity=0.6)
+        elif day == 2:
+            return EmotionalWavePoint(timestamp=timestamp, valence=0.2, arousal=0.6, dominance=0.3, intensity=0.5)
+        else:  # Day 3
+            return EmotionalWavePoint(timestamp=timestamp, valence=-0.6, arousal=0.4, dominance=-0.4, intensity=0.8)
+    
+    # Scenario 2: Recovery Trajectory
+    elif scenario_choice == 2:
+        if day == 1:
+            return EmotionalWavePoint(timestamp=timestamp, valence=-0.5, arousal=0.2, dominance=-0.3, intensity=0.7)
+        elif day == 2:
+            return EmotionalWavePoint(timestamp=timestamp, valence=0.0, arousal=0.4, dominance=0.1, intensity=0.4)
+        else:  # Day 3
+            return EmotionalWavePoint(timestamp=timestamp, valence=0.6, arousal=0.5, dominance=0.4, intensity=0.5)
+    
+    # Scenario 3: Emotional Volatility
+    else:
+        if day == 1:
+            return EmotionalWavePoint(timestamp=timestamp, valence=0.8, arousal=0.9, dominance=0.6, intensity=0.8)
+        elif day == 2:
+            return EmotionalWavePoint(timestamp=timestamp, valence=-0.7, arousal=0.3, dominance=-0.5, intensity=0.8)
+        else:  # Day 3
+            return EmotionalWavePoint(timestamp=timestamp, valence=0.7, arousal=0.7, dominance=0.5, intensity=0.7)
+
+def _get_fallback_response(scenario_choice: int, emotional_states: list) -> str:
+    """Get fallback responses when LLM fails"""
+    
+    if scenario_choice == 1:  # Burnout
+        return "I can see a clear pattern of burnout developing over these three days. You started energized but the workload is clearly overwhelming you now. This is a common pattern - want to talk about ways to manage this transition?"
+    
+    elif scenario_choice == 2:  # Recovery
+        return "What a beautiful recovery journey! You've moved from heaviness to reconnecting with yourself. This shows real resilience and self-awareness. How does it feel to notice this positive shift?"
+    
+    else:  # Volatility
+        return "You've been on quite an emotional rollercoaster! High success, deep disappointment, then problem-solving triumph. Your ability to bounce back and find solutions is remarkable, even amid the ups and downs."
+
+def _display_emotional_trajectory(daily_inputs: list, emotional_states: list, scenario_name: str):
+    """Display the complete emotional journey"""
+    console = Console()
+    
+    console.print(f"\n[bold cyan]Emotional Journey: {scenario_name}[/bold cyan]")
     
     trajectory_table = Table(title="3-Day Progression", show_header=True)
     trajectory_table.add_column("Day", style="bold")
@@ -180,22 +284,50 @@ def simulate_3_day_checkins():
     trajectory_table.add_column("Arousal", style="blue")
     trajectory_table.add_column("Dominance", style="purple")
     trajectory_table.add_column("Intensity", style="red")
-    trajectory_table.add_column("Summary", style="dim")
     
-    summaries = ["Excited but tired", "Neutral/flat", "Overwhelmed/done"]
-    
-    for i, (day_data, emotion, summary) in enumerate(zip(daily_inputs, emotional_states, summaries)):
+    for i, (day_data, emotion) in enumerate(zip(daily_inputs, emotional_states)):
         trajectory_table.add_row(
             f"Day {day_data['day']}",
             f'"{day_data["input"]}"',
             f"{emotion.valence:+.2f}",
             f"{emotion.arousal:.2f}",
             f"{emotion.dominance:+.2f}",
-            f"{emotion.intensity:.2f}",
-            summary
+            f"{emotion.intensity:.2f}"
         )
     
     console.print(trajectory_table)
+
+def main():
+    """Main function to run the test scenarios"""
+    console = Console()
+    
+    # Show available scenarios
+    show_scenario_options()
+    
+    # Get user choice
+    try:
+        choice = IntPrompt.ask(
+            "\n[bold cyan]Choose a scenario to run[/bold cyan]",
+            choices=["1", "2", "3"],
+            default=1
+        )
+        
+        # Run the selected scenario
+        run_scenario_simulation(choice)
+        
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Simulation cancelled.[/yellow]")
+        return
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        return
+
+# Legacy function for backwards compatibility
+def simulate_3_day_checkins():
+    """
+    Legacy function - runs the original scenario (now Scenario 1: Workplace Burnout)
+    """
+    run_scenario_simulation(1)
 
 def _interpret_valence(valence: float) -> str:
     if valence > 0.3: return "Positive 😊"
@@ -238,4 +370,4 @@ def _get_trend_emoji(trend: str) -> str:
     else: return "➡️ Stable"
 
 if __name__ == "__main__":
-    simulate_3_day_checkins() 
+    main() 
